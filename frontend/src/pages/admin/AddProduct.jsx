@@ -1,6 +1,20 @@
 import { useState } from "react"
-const API_URL = import.meta.env.VITE_API_URL
 import { Link, useNavigate } from "react-router-dom"
+import {
+  ArrowLeft,
+  Check,
+  CircleAlert,
+  Image as ImageIcon,
+  Link2,
+  Loader2,
+  PackagePlus,
+  Plus,
+  Sparkles,
+  Tag,
+  Trash2
+} from "lucide-react"
+
+const API_URL = import.meta.env.VITE_API_URL
 
 function AddProduct() {
   const navigate = useNavigate()
@@ -83,6 +97,10 @@ function AddProduct() {
 
       const token = localStorage.getItem("token")
 
+      if (!token) {
+        throw new Error("Please login as admin.")
+      }
+
       const response = await fetch(
         `${API_URL}/api/product/add`,
         {
@@ -117,6 +135,7 @@ function AddProduct() {
       navigate("/admin/products")
     } catch (error) {
       console.error("Add product error:", error)
+
       setError(
         error.message || "Failed to add product"
       )
@@ -126,274 +145,680 @@ function AddProduct() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
 
-        {/* Header */}
-        <div className="mb-8">
+        {/* =================================
+            HEADER
+        ================================= */}
+
+        <div className="mb-7">
 
           <Link
             to="/admin/products"
-            className="text-sm font-semibold text-gray-500 hover:text-black"
+            className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-blue-600"
           >
-            ← Back to Products
+            <ArrowLeft size={16} />
+            Back to Products
           </Link>
 
-          <p className="mt-6 text-sm font-semibold uppercase tracking-wider text-gray-500">
-            ShopX Admin
-          </p>
+          <div className="mt-6 flex items-start gap-4">
 
-          <h1 className="mt-2 text-3xl font-bold">
-            Add Product
-          </h1>
+            <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#0B1F3A] text-white shadow-sm sm:flex">
+              <PackagePlus size={23} />
+            </div>
 
-          <p className="mt-2 text-gray-500">
-            Add a new product to your store.
-          </p>
+            <div>
+
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
+                <Tag size={13} />
+                ShopX Admin
+              </div>
+
+              <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1F3A] sm:text-3xl lg:text-4xl">
+                Add Product
+              </h1>
+
+              <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
+                Add a new product to your ShopX catalog
+                with pricing, categories, sizes and
+                product imagery.
+              </p>
+
+            </div>
+
+          </div>
 
         </div>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border bg-white p-6 shadow-sm sm:p-8"
-        >
+        {/* =================================
+            FORM
+        ================================= */}
+
+        <form onSubmit={handleSubmit}>
+
+          {/* Error */}
 
           {error && (
-            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-              {error}
-            </div>
-          )}
+            <div className="mb-5 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
 
-          {/* Product Name */}
-          <div>
-            <label className="mb-2 block text-sm font-semibold">
-              Product Name *
-            </label>
-
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="e.g. Premium Cotton T-Shirt"
-              className="w-full rounded-lg border px-4 py-3 outline-none transition focus:border-black"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="mt-6">
-            <label className="mb-2 block text-sm font-semibold">
-              Description *
-            </label>
-
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows="5"
-              placeholder="Enter product description..."
-              className="w-full resize-none rounded-lg border px-4 py-3 outline-none transition focus:border-black"
-            />
-          </div>
-
-          {/* Price + Category */}
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold">
-                Price (₹) *
-              </label>
-
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                min="1"
-                placeholder="999"
-                className="w-full rounded-lg border px-4 py-3 outline-none transition focus:border-black"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-semibold">
-                Category *
-              </label>
-
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full rounded-lg border bg-white px-4 py-3 outline-none transition focus:border-black"
-              >
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
-                <option value="Kids">Kids</option>
-              </select>
-            </div>
-
-          </div>
-
-          {/* Sub Category */}
-          <div className="mt-6">
-
-            <label className="mb-2 block text-sm font-semibold">
-              Sub Category *
-            </label>
-
-            <select
-              name="subCategory"
-              value={formData.subCategory}
-              onChange={handleChange}
-              className="w-full rounded-lg border bg-white px-4 py-3 outline-none transition focus:border-black"
-            >
-              <option value="Topwear">
-                Topwear
-              </option>
-
-              <option value="Bottomwear">
-                Bottomwear
-              </option>
-
-              <option value="Winterwear">
-                Winterwear
-              </option>
-
-              <option value="Footwear">
-                Footwear
-              </option>
-
-              <option value="Accessories">
-                Accessories
-              </option>
-            </select>
-
-          </div>
-
-          {/* Image URL */}
-          <div className="mt-6">
-
-            <label className="mb-2 block text-sm font-semibold">
-              Image URL *
-            </label>
-
-            <input
-              type="url"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="https://example.com/product-image.jpg"
-              className="w-full rounded-lg border px-4 py-3 outline-none transition focus:border-black"
-            />
-
-            <p className="mt-2 text-xs text-gray-500">
-              Use a direct image URL.
-            </p>
-
-          </div>
-
-          {/* Sizes */}
-          <div className="mt-6">
-
-            <label className="mb-2 block text-sm font-semibold">
-              Sizes
-            </label>
-
-            <div className="flex gap-2">
-
-              <input
-                type="text"
-                value={sizeInput}
-                onChange={(event) =>
-                  setSizeInput(event.target.value)
-                }
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault()
-                    addSize()
-                  }
-                }}
-                placeholder="e.g. M"
-                className="flex-1 rounded-lg border px-4 py-3 uppercase outline-none transition focus:border-black"
-              />
-
-              <button
-                type="button"
-                onClick={addSize}
-                className="rounded-lg bg-gray-100 px-5 py-3 font-semibold transition hover:bg-gray-200"
-              >
-                Add
-              </button>
-
-            </div>
-
-            {formData.sizes.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-
-                {formData.sizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => removeSize(size)}
-                    className="rounded-lg bg-black px-3 py-2 text-sm font-semibold text-white"
-                  >
-                    {size} ×
-                  </button>
-                ))}
-
-              </div>
-            )}
-
-          </div>
-
-          {/* Bestseller */}
-          <div className="mt-6 rounded-lg border p-4">
-
-            <label className="flex cursor-pointer items-center gap-3">
-
-              <input
-                type="checkbox"
-                name="bestseller"
-                checked={formData.bestseller}
-                onChange={handleChange}
-                className="h-4 w-4"
+              <CircleAlert
+                size={19}
+                className="mt-0.5 shrink-0"
               />
 
               <div>
-                <p className="font-semibold">
-                  Mark as Bestseller
+                <p className="font-bold">
+                  Unable to add product
                 </p>
 
-                <p className="text-sm text-gray-500">
-                  Show this product as a bestseller.
+                <p className="mt-1 leading-5">
+                  {error}
                 </p>
               </div>
 
-            </label>
+            </div>
+          )}
+
+          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+
+            {/* =================================
+                MAIN FORM
+            ================================= */}
+
+            <div className="space-y-6">
+
+              {/* Basic Information */}
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+                <div className="mb-6 flex items-center gap-3">
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <PackagePlus size={19} />
+                  </div>
+
+                  <div>
+                    <h2 className="font-extrabold text-[#0B1F3A]">
+                      Basic Information
+                    </h2>
+
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Enter the main product details
+                    </p>
+                  </div>
+
+                </div>
+
+                {/* Product Name */}
+
+                <div>
+
+                  <label
+                    htmlFor="product-name"
+                    className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+                  >
+                    Product Name *
+                  </label>
+
+                  <input
+                    id="product-name"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="e.g. Premium Cotton T-Shirt"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  />
+
+                </div>
+
+                {/* Description */}
+
+                <div className="mt-5">
+
+                  <label
+                    htmlFor="product-description"
+                    className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+                  >
+                    Description *
+                  </label>
+
+                  <textarea
+                    id="product-description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="6"
+                    placeholder="Describe the product, its features, material, benefits and other important details..."
+                    className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  />
+
+                </div>
+
+              </section>
+
+              {/* Pricing & Classification */}
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+                <div className="mb-6 flex items-center gap-3">
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                    <Tag size={19} />
+                  </div>
+
+                  <div>
+                    <h2 className="font-extrabold text-[#0B1F3A]">
+                      Pricing & Classification
+                    </h2>
+
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Set pricing and organize the product
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="grid gap-5 sm:grid-cols-2">
+
+                  {/* Price */}
+
+                  <div>
+
+                    <label
+                      htmlFor="product-price"
+                      className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+                    >
+                      Price (₹) *
+                    </label>
+
+                    <div className="relative">
+
+                      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">
+                        ₹
+                      </span>
+
+                      <input
+                        id="product-price"
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        min="1"
+                        placeholder="999"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-9 pr-4 text-sm font-bold text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      />
+
+                    </div>
+
+                  </div>
+
+                  {/* Category */}
+
+                  <div>
+
+                    <label
+                      htmlFor="product-category"
+                      className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+                    >
+                      Category *
+                    </label>
+
+                    <select
+                      id="product-category"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#0B1F3A] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                    >
+                      <option value="Men">Men</option>
+                      <option value="Women">
+                        Women
+                      </option>
+                      <option value="Kids">Kids</option>
+                    </select>
+
+                  </div>
+
+                </div>
+
+                {/* Sub Category */}
+
+                <div className="mt-5">
+
+                  <label
+                    htmlFor="product-subcategory"
+                    className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+                  >
+                    Sub Category *
+                  </label>
+
+                  <select
+                    id="product-subcategory"
+                    name="subCategory"
+                    value={formData.subCategory}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#0B1F3A] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                  >
+                    <option value="Topwear">
+                      Topwear
+                    </option>
+
+                    <option value="Bottomwear">
+                      Bottomwear
+                    </option>
+
+                    <option value="Winterwear">
+                      Winterwear
+                    </option>
+
+                    <option value="Footwear">
+                      Footwear
+                    </option>
+
+                    <option value="Accessories">
+                      Accessories
+                    </option>
+                  </select>
+
+                </div>
+
+              </section>
+
+              {/* Product Image */}
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+                <div className="mb-6 flex items-center gap-3">
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
+                    <ImageIcon size={19} />
+                  </div>
+
+                  <div>
+                    <h2 className="font-extrabold text-[#0B1F3A]">
+                      Product Image
+                    </h2>
+
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Add a direct image URL
+                    </p>
+                  </div>
+
+                </div>
+
+                <label
+                  htmlFor="product-image"
+                  className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
+                >
+                  Image URL *
+                </label>
+
+                <div className="relative">
+
+                  <Link2
+                    size={17}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+
+                  <input
+                    id="product-image"
+                    type="url"
+                    name="image"
+                    value={formData.image}
+                    onChange={handleChange}
+                    placeholder="https://example.com/product-image.jpg"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm font-medium text-[#0B1F3A] outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  />
+
+                </div>
+
+                <p className="mt-2 text-xs leading-5 text-slate-400">
+                  Use a direct image URL that can be
+                  publicly accessed by your website.
+                </p>
+
+                {/* Image Preview */}
+
+                {formData.image.trim() && (
+                  <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+
+                    <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
+
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Image Preview
+                      </p>
+
+                      <ImageIcon
+                        size={15}
+                        className="text-slate-400"
+                      />
+
+                    </div>
+
+                    <div className="flex min-h-52 items-center justify-center p-4">
+
+                      <img
+                        src={formData.image}
+                        alt="Product preview"
+                        className="max-h-64 max-w-full rounded-xl object-contain"
+                        onError={(event) => {
+                          event.currentTarget.style.display =
+                            "none"
+                        }}
+                      />
+
+                    </div>
+
+                  </div>
+                )}
+
+              </section>
+
+              {/* Sizes */}
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+                <div className="mb-6 flex items-center gap-3">
+
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                    <span className="text-sm font-extrabold">
+                      S
+                    </span>
+                  </div>
+
+                  <div>
+                    <h2 className="font-extrabold text-[#0B1F3A]">
+                      Available Sizes
+                    </h2>
+
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Add all available product sizes
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className="flex flex-col gap-2 sm:flex-row">
+
+                  <input
+                    type="text"
+                    value={sizeInput}
+                    onChange={(event) =>
+                      setSizeInput(event.target.value)
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault()
+                        addSize()
+                      }
+                    }}
+                    placeholder="e.g. M, L, XL or 9"
+                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold uppercase text-[#0B1F3A] outline-none transition placeholder:normal-case placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={addSize}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B1F3A] px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-600"
+                  >
+                    <Plus size={16} />
+                    Add Size
+                  </button>
+
+                </div>
+
+                {formData.sizes.length > 0 ? (
+                  <div className="mt-5">
+
+                    <p className="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Selected Sizes
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+
+                      {formData.sizes.map((size) => (
+
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() =>
+                            removeSize(size)
+                          }
+                          className="group inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Check
+                            size={14}
+                            className="group-hover:hidden"
+                          />
+
+                          <Trash2
+                            size={14}
+                            className="hidden group-hover:block"
+                          />
+
+                          {size}
+
+                        </button>
+
+                      ))}
+
+                    </div>
+
+                  </div>
+                ) : (
+                  <div className="mt-5 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-center">
+
+                    <p className="text-xs font-medium text-slate-400">
+                      No sizes added yet
+                    </p>
+
+                  </div>
+                )}
+
+              </section>
+
+            </div>
+
+            {/* =================================
+                SIDEBAR
+            ================================= */}
+
+            <div className="space-y-6">
+
+              {/* Bestseller */}
+
+              <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+                <div className="flex items-start gap-3">
+
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <Sparkles size={19} />
+                  </div>
+
+                  <div>
+                    <h2 className="font-extrabold text-[#0B1F3A]">
+                      Product Visibility
+                    </h2>
+
+                    <p className="mt-1 text-xs leading-5 text-slate-400">
+                      Highlight this product in your
+                      store.
+                    </p>
+                  </div>
+
+                </div>
+
+                <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/50">
+
+                  <input
+                    type="checkbox"
+                    name="bestseller"
+                    checked={formData.bestseller}
+                    onChange={handleChange}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-blue-600"
+                  />
+
+                  <div>
+
+                    <p className="text-sm font-bold text-[#0B1F3A]">
+                      Mark as Bestseller
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      Show this product as a bestseller
+                      across your store.
+                    </p>
+
+                  </div>
+
+                </label>
+
+              </section>
+
+              {/* Product Summary */}
+
+              <section className="rounded-2xl bg-[#0B1F3A] p-5 text-white shadow-xl shadow-[#0B1F3A]/10 sm:p-6">
+
+                <div className="flex items-center gap-2">
+
+                  <PackagePlus
+                    size={18}
+                    className="text-blue-300"
+                  />
+
+                  <h2 className="font-extrabold">
+                    Product Summary
+                  </h2>
+
+                </div>
+
+                <div className="mt-5 space-y-4">
+
+                  <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-3">
+
+                    <span className="text-xs text-slate-300">
+                      Name
+                    </span>
+
+                    <span className="max-w-[170px] truncate text-right text-xs font-bold">
+                      {formData.name || "Not added"}
+                    </span>
+
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-3">
+
+                    <span className="text-xs text-slate-300">
+                      Price
+                    </span>
+
+                    <span className="text-sm font-extrabold">
+                      {formData.price
+                        ? `₹${Number(
+                            formData.price
+                          ).toLocaleString("en-IN")}`
+                        : "₹0"}
+                    </span>
+
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-3">
+
+                    <span className="text-xs text-slate-300">
+                      Category
+                    </span>
+
+                    <span className="text-xs font-bold">
+                      {formData.category}
+                    </span>
+
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-3">
+
+                    <span className="text-xs text-slate-300">
+                      Sizes
+                    </span>
+
+                    <span className="text-xs font-bold">
+                      {formData.sizes.length}
+                    </span>
+
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4">
+
+                    <span className="text-xs text-slate-300">
+                      Bestseller
+                    </span>
+
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold">
+
+                      {formData.bestseller ? (
+                        <>
+                          <Check
+                            size={14}
+                            className="text-blue-300"
+                          />
+                          Yes
+                        </>
+                      ) : (
+                        "No"
+                      )}
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </section>
+
+            </div>
 
           </div>
 
-          {/* Buttons */}
-          <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          {/* =================================
+              ACTIONS
+          ================================= */}
 
-            <Link
-              to="/admin/products"
-              className="rounded-lg border px-6 py-3 text-center font-semibold transition hover:bg-gray-100"
-            >
-              Cancel
-            </Link>
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-black px-6 py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading
-                ? "Adding Product..."
-                : "Add Product"}
-            </button>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+              <Link
+                to="/admin/products"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-6 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50 hover:text-[#0B1F3A]"
+              >
+                <ArrowLeft size={16} />
+                Cancel
+              </Link>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B1F3A] px-7 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-600/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <Loader2
+                      size={17}
+                      className="animate-spin"
+                    />
+                    Adding Product...
+                  </>
+                ) : (
+                  <>
+                    <PackagePlus size={17} />
+                    Add Product
+                  </>
+                )}
+              </button>
+
+            </div>
 
           </div>
 

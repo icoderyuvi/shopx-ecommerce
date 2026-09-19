@@ -5,142 +5,303 @@ import { useState, useContext } from "react"
 import {
   ShoppingCart,
   User,
-  Search
+  Search,
+  Menu,
+  X,
 } from "lucide-react"
 
 import { ShopContext } from "../context/ShopContext"
 
 function Navbar() {
-
-  // Get cart count from ShopContext
   const { getCartCount } = useContext(ShopContext)
 
-  // Used to navigate to different pages
   const navigate = useNavigate()
 
-  // Store search input
   const [searchText, setSearchText] = useState("")
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-
-  // Handle search form
+  // Handle search
   const handleSearch = (e) => {
-
-    // Prevent page refresh
     e.preventDefault()
 
-    // If search box is empty
-    if (searchText.trim() === "") {
+    const search = searchText.trim()
+
+    if (search === "") {
       navigate("/products")
-      return
+    } else {
+      navigate(`/products?search=${encodeURIComponent(search)}`)
     }
 
-    // Send search text to Products page through URL
-    navigate(
-      `/products?search=${encodeURIComponent(searchText.trim())}`
-    )
+    setMobileMenuOpen(false)
   }
 
+  // Close mobile menu
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+  }
 
   return (
-    <nav className="border-b bg-white">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md">
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      {/* =========================
+          MAIN NAVBAR
+      ========================== */}
+
+      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        <div className="flex h-18 items-center justify-between gap-4">
+
+          {/* =========================
+              LOGO
+          ========================== */}
+
+          <Link
+            to="/"
+            onClick={closeMobileMenu}
+            className="shrink-0 text-2xl font-extrabold tracking-tight text-[#0B1F3A] transition-colors duration-200 hover:text-[#2563EB] sm:text-3xl"
+          >
+            Shop<span className="text-[#2563EB]">X</span>
+          </Link>
+
+
+          {/* =========================
+              DESKTOP SEARCH
+          ========================== */}
+
+          <form
+            onSubmit={handleSearch}
+            className="hidden min-w-0 flex-1 md:flex md:max-w-xl lg:max-w-2xl"
+          >
+
+            <div className="flex w-full items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all duration-200 focus-within:border-[#2563EB] focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
+
+              <Search
+                size={20}
+                strokeWidth={2}
+                className="ml-4 shrink-0 text-slate-400"
+              />
+
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              />
+
+              <button
+                type="submit"
+                className="mr-1.5 rounded-lg bg-[#0B1F3A] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#2563EB] active:scale-95"
+              >
+                Search
+              </button>
+
+            </div>
+
+          </form>
+
+
+          {/* =========================
+              DESKTOP NAVIGATION
+          ========================== */}
+
+          <div className="hidden items-center gap-2 md:flex">
+
+            {/* Products */}
+
+            <Link
+              to="/products"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
+              Products
+            </Link>
+
+
+            {/* Cart */}
+
+            <Link
+              to="/cart"
+              className="group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
+
+              <ShoppingCart
+                size={20}
+                strokeWidth={2}
+                className="transition-transform duration-200 group-hover:-translate-y-0.5"
+              />
+
+              <span>Cart</span>
+
+              {getCartCount() > 0 && (
+                <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#2563EB] px-1 text-[10px] font-bold text-white shadow-sm">
+                  {getCartCount()}
+                </span>
+              )}
+
+            </Link>
+
+
+            {/* Profile */}
+
+            <Link
+              to="/profile"
+              aria-label="Profile"
+              className="ml-1 flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
+              <User size={20} strokeWidth={2} />
+            </Link>
+
+          </div>
+
+
+          {/* =========================
+              MOBILE ACTIONS
+          ========================== */}
+
+          <div className="flex items-center gap-1 md:hidden">
+
+            {/* Mobile Cart */}
+
+            <Link
+              to="/cart"
+              onClick={closeMobileMenu}
+              aria-label="Cart"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#0B1F3A] transition-colors duration-200 hover:bg-blue-50"
+            >
+
+              <ShoppingCart size={21} strokeWidth={2} />
+
+              {getCartCount() > 0 && (
+                <span className="absolute right-0.5 top-0.5 flex min-h-4 min-w-4 items-center justify-center rounded-full bg-[#2563EB] px-1 text-[9px] font-bold text-white">
+                  {getCartCount()}
+                </span>
+              )}
+
+            </Link>
+
+
+            {/* Hamburger */}
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              className="flex h-10 w-10 items-center justify-center rounded-full text-[#0B1F3A] transition-colors duration-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
+              {mobileMenuOpen ? (
+                <X size={23} strokeWidth={2} />
+              ) : (
+                <Menu size={23} strokeWidth={2} />
+              )}
+            </button>
+
+          </div>
+
+        </div>
 
 
         {/* =========================
-            LOGO
-        ========================== */}
-
-        <Link
-          to="/"
-          className="text-2xl font-bold"
-        >
-          ShopX
-        </Link>
-
-
-        {/* =========================
-            SEARCH
+            MOBILE SEARCH
         ========================== */}
 
         <form
           onSubmit={handleSearch}
-          className="flex w-1/3 items-center rounded-lg border px-3"
+          className="pb-4 md:hidden"
         >
 
-          {/* Search Icon */}
+          <div className="flex w-full items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all duration-200 focus-within:border-[#2563EB] focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10">
 
-          <Search size={20} />
+            <Search
+              size={19}
+              className="ml-3 shrink-0 text-slate-400"
+            />
 
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400"
+            />
 
-          {/* Search Input */}
+            <button
+              type="submit"
+              className="mr-1 rounded-lg bg-[#0B1F3A] px-3 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-[#2563EB]"
+            >
+              Search
+            </button>
 
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="w-full px-3 py-2 outline-none"
-          />
-
-
-          {/* Search Button */}
-
-          <button
-            type="submit"
-            className="rounded-md bg-black px-3 py-2 text-sm text-white"
-          >
-            Search
-          </button>
+          </div>
 
         </form>
 
 
         {/* =========================
-            NAVIGATION
+            MOBILE MENU
         ========================== */}
 
-        <div className="flex items-center gap-5">
+        <div
+          className={`overflow-hidden transition-all duration-300 md:hidden ${
+            mobileMenuOpen
+              ? "max-h-80 pb-4 opacity-100"
+              : "max-h-0 opacity-0"
+          }`}
+        >
+
+          <div className="border-t border-slate-100 pt-3">
+
+            {/* Products */}
+
+            <Link
+              to="/products"
+              onClick={closeMobileMenu}
+              className="flex items-center rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
+              Products
+            </Link>
 
 
-          {/* Products */}
+            {/* Cart */}
 
-          <Link to="/products">
-            Products
-          </Link>
+            <Link
+              to="/cart"
+              onClick={closeMobileMenu}
+              className="flex items-center justify-between rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
 
-
-          {/* Cart */}
-
-          <Link
-            to="/cart"
-            className="relative flex items-center gap-1"
-          >
-
-            <ShoppingCart size={20} />
-
-            Cart
-
-            {getCartCount() > 0 && (
-              <span className="absolute -right-3 -top-3 flex h-5 w-5 items-center justify-center rounded-full bg-black text-xs text-white">
-                {getCartCount()}
+              <span className="flex items-center gap-3">
+                <ShoppingCart size={19} />
+                Cart
               </span>
-            )}
 
-          </Link>
+              {getCartCount() > 0 && (
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-[#2563EB]">
+                  {getCartCount()}
+                </span>
+              )}
+
+            </Link>
 
 
-          {/* Profile */}
+            {/* Profile */}
 
-          <Link to="/profile">
-            <User size={20} />
-          </Link>
+            <Link
+              to="/profile"
+              onClick={closeMobileMenu}
+              className="flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-700 transition-colors duration-200 hover:bg-blue-50 hover:text-[#2563EB]"
+            >
+              <User size={19} />
+              Profile
+            </Link>
+
+          </div>
 
         </div>
 
-      </div>
+      </nav>
 
-    </nav>
+    </header>
   )
 }
 
