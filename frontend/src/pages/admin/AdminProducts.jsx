@@ -4,7 +4,6 @@ import {
   AlertCircle,
   ArrowRight,
   Boxes,
-  Check,
   ChevronDown,
   CirclePlus,
   Edit3,
@@ -127,17 +126,18 @@ function AdminProducts() {
     fetchProducts()
   }, [])
 
-  const categories = useMemo(() => {
-    const uniqueCategories = [
-      ...new Set(
-        products
-          .map((product) => product.category)
-          .filter(Boolean)
-      )
-    ]
+  // =========================
+  // MAIN PRODUCT CATEGORIES
+  // Keep these consistent with
+  // Products.jsx and AddProduct.jsx
+  // =========================
 
-    return uniqueCategories.sort()
-  }, [products])
+  const categories = [
+    "Fashion",
+    "Electronics",
+    "Shoes",
+    "Accessories"
+  ]
 
   const filteredProducts = useMemo(() => {
     const searchText = search
@@ -191,11 +191,8 @@ function AdminProducts() {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
-
         <div className="mx-auto flex min-h-[70vh] max-w-7xl items-center justify-center">
-
           <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
               <Loader2
                 size={28}
@@ -210,11 +207,8 @@ function AdminProducts() {
             <p className="mt-2 text-sm text-slate-500">
               Fetching your store products...
             </p>
-
           </div>
-
         </div>
-
       </main>
     )
   }
@@ -222,11 +216,8 @@ function AdminProducts() {
   if (error) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
-
         <div className="mx-auto flex min-h-[70vh] max-w-4xl items-center justify-center">
-
           <div className="w-full rounded-3xl border border-red-100 bg-white p-8 text-center shadow-sm sm:p-12">
-
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
               <AlertCircle size={30} />
             </div>
@@ -247,18 +238,14 @@ function AdminProducts() {
               <RefreshCw size={16} />
               Try Again
             </button>
-
           </div>
-
         </div>
-
       </main>
     )
   }
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-
       <div className="mx-auto max-w-7xl">
 
         {/* =================================
@@ -266,9 +253,7 @@ function AdminProducts() {
         ================================= */}
 
         <div className="mb-7 flex flex-col gap-5 sm:mb-8 lg:flex-row lg:items-center lg:justify-between">
-
           <div>
-
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
               <Boxes size={14} />
               ShopX Admin
@@ -282,11 +267,9 @@ function AdminProducts() {
               Manage your store inventory, product
               details and catalog.
             </p>
-
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-
             <button
               type="button"
               onClick={() => fetchProducts(true)}
@@ -314,9 +297,7 @@ function AdminProducts() {
               <CirclePlus size={17} />
               Add Product
             </Link>
-
           </div>
-
         </div>
 
         {/* =================================
@@ -328,11 +309,8 @@ function AdminProducts() {
           {/* Total */}
 
           <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-lg">
-
             <div className="flex items-start justify-between">
-
               <div>
-
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Total Products
                 </p>
@@ -344,25 +322,19 @@ function AdminProducts() {
                 <p className="mt-1 text-sm text-slate-500">
                   Products in store
                 </p>
-
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:scale-105">
                 <Package size={21} />
               </div>
-
             </div>
-
           </div>
 
           {/* Categories */}
 
           <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-lg">
-
             <div className="flex items-start justify-between">
-
               <div>
-
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Categories
                 </p>
@@ -372,27 +344,21 @@ function AdminProducts() {
                 </p>
 
                 <p className="mt-1 text-sm text-slate-500">
-                  Product categories
+                  Main product categories
                 </p>
-
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition group-hover:scale-105">
                 <Boxes size={21} />
               </div>
-
             </div>
-
           </div>
 
           {/* Showing */}
 
           <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-100 hover:shadow-lg">
-
             <div className="flex items-start justify-between">
-
               <div>
-
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Showing
                 </p>
@@ -404,17 +370,13 @@ function AdminProducts() {
                 <p className="mt-1 text-sm text-slate-500">
                   Matching products
                 </p>
-
               </div>
 
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition group-hover:scale-105">
                 <Eye size={21} />
               </div>
-
             </div>
-
           </div>
-
         </div>
 
         {/* =================================
@@ -425,13 +387,11 @@ function AdminProducts() {
           <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
             <div className="flex items-center gap-2">
-
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <Filter size={17} />
               </div>
 
               <div>
-
                 <h2 className="text-base font-extrabold text-[#0B1F3A]">
                   Find Products
                 </h2>
@@ -439,9 +399,7 @@ function AdminProducts() {
                 <p className="text-xs text-slate-400">
                   Search and filter your catalog
                 </p>
-
               </div>
-
             </div>
 
             <div className="mt-5 grid gap-4 md:grid-cols-[1fr_240px]">
@@ -449,7 +407,6 @@ function AdminProducts() {
               {/* Search */}
 
               <div>
-
                 <label
                   htmlFor="product-search"
                   className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
@@ -458,7 +415,6 @@ function AdminProducts() {
                 </label>
 
                 <div className="relative">
-
                   <Search
                     size={18}
                     className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -485,15 +441,12 @@ function AdminProducts() {
                       <X size={15} />
                     </button>
                   )}
-
                 </div>
-
               </div>
 
               {/* Category */}
 
               <div>
-
                 <label
                   htmlFor="category-filter"
                   className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500"
@@ -502,7 +455,6 @@ function AdminProducts() {
                 </label>
 
                 <div className="relative">
-
                   <select
                     id="category-filter"
                     value={category}
@@ -529,32 +481,23 @@ function AdminProducts() {
                     size={17}
                     className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
                   />
-
                 </div>
-
               </div>
-
             </div>
 
             {hasFilters && (
               <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
 
                 <p className="text-sm text-slate-500">
-
                   Showing{" "}
-
                   <span className="font-bold text-[#0B1F3A]">
                     {filteredProducts.length}
-                  </span>
-
-                  {" "}of{" "}
-
+                  </span>{" "}
+                  of{" "}
                   <span className="font-bold text-[#0B1F3A]">
                     {products.length}
-                  </span>
-
-                  {" "}products
-
+                  </span>{" "}
+                  products
                 </p>
 
                 <button
@@ -565,10 +508,8 @@ function AdminProducts() {
                   <X size={15} />
                   Clear Filters
                 </button>
-
               </div>
             )}
-
           </section>
         )}
 
@@ -600,7 +541,6 @@ function AdminProducts() {
               <CirclePlus size={17} />
               Add Product
             </Link>
-
           </div>
         )}
 
@@ -633,7 +573,6 @@ function AdminProducts() {
                 <X size={16} />
                 Clear Filters
               </button>
-
             </div>
           )}
 
@@ -649,7 +588,6 @@ function AdminProducts() {
             <div className="flex flex-col gap-3 border-b border-slate-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
 
               <div>
-
                 <h2 className="text-lg font-extrabold text-[#0B1F3A]">
                   Product Catalog
                 </h2>
@@ -661,7 +599,6 @@ function AdminProducts() {
                     : "products"}{" "}
                   displayed
                 </p>
-
               </div>
 
               {hasFilters && (
@@ -670,7 +607,6 @@ function AdminProducts() {
                   Filtered Results
                 </div>
               )}
-
             </div>
 
             {/* =================================
@@ -678,11 +614,9 @@ function AdminProducts() {
             ================================= */}
 
             <div className="hidden overflow-x-auto md:block">
-
               <table className="w-full min-w-[950px] text-left">
 
                 <thead className="border-b border-slate-100 bg-slate-50">
-
                   <tr>
 
                     <th className="px-5 py-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -706,7 +640,6 @@ function AdminProducts() {
                     </th>
 
                   </tr>
-
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
@@ -721,7 +654,6 @@ function AdminProducts() {
                       {/* Product */}
 
                       <td className="px-5 py-5">
-
                         <div className="flex items-center gap-4">
 
                           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100">
@@ -737,7 +669,6 @@ function AdminProducts() {
                                 <Sparkles size={11} />
                               </div>
                             )}
-
                           </div>
 
                           <div className="min-w-0">
@@ -761,15 +692,12 @@ function AdminProducts() {
                             </p>
 
                           </div>
-
                         </div>
-
                       </td>
 
                       {/* Category */}
 
                       <td className="px-5 py-5">
-
                         <p className="text-sm font-bold text-[#0B1F3A]">
                           {product.category || "N/A"}
                         </p>
@@ -777,23 +705,19 @@ function AdminProducts() {
                         <p className="mt-1 text-xs text-slate-400">
                           {product.subCategory || "N/A"}
                         </p>
-
                       </td>
 
                       {/* Price */}
 
                       <td className="px-5 py-5">
-
                         <p className="text-sm font-extrabold text-[#0B1F3A]">
                           ₹{formatPrice(product.price)}
                         </p>
-
                       </td>
 
                       {/* Sizes */}
 
                       <td className="px-5 py-5">
-
                         <div className="flex max-w-[190px] flex-wrap gap-1.5">
 
                           {Array.isArray(product.sizes) &&
@@ -815,13 +739,11 @@ function AdminProducts() {
                           )}
 
                         </div>
-
                       </td>
 
                       {/* Actions */}
 
                       <td className="px-5 py-5">
-
                         <div className="flex justify-end gap-2">
 
                           <Link
@@ -846,17 +768,13 @@ function AdminProducts() {
                           </button>
 
                         </div>
-
                       </td>
 
                     </tr>
-
                   ))}
 
                 </tbody>
-
               </table>
-
             </div>
 
             {/* =================================
@@ -919,7 +837,6 @@ function AdminProducts() {
                       </p>
 
                     </div>
-
                   </div>
 
                   {/* Description */}
@@ -957,7 +874,6 @@ function AdminProducts() {
                       )}
 
                     </div>
-
                   </div>
 
                   {/* Actions */}
@@ -986,13 +902,10 @@ function AdminProducts() {
                     </button>
 
                   </div>
-
                 </div>
-
               ))}
 
             </div>
-
           </section>
         )}
 

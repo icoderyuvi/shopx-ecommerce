@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import {
   ArrowLeft,
@@ -16,6 +16,32 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL
 
+// =====================================================
+// PRODUCT CATEGORIES
+// =====================================================
+
+const categoryOptions = {
+  Fashion: ["Men", "Women", "Kids"],
+
+  Electronics: [
+    "Mobiles",
+    "Laptops",
+    "Headphones",
+    "Smart Watches"
+  ],
+
+  Shoes: ["Men", "Women", "Kids"],
+
+  Accessories: [
+    "Bags",
+    "Wallets",
+    "Sunglasses",
+    "Belts"
+  ]
+}
+
+const categories = Object.keys(categoryOptions)
+
 function AddProduct() {
   const navigate = useNavigate()
 
@@ -24,8 +50,8 @@ function AddProduct() {
     description: "",
     price: "",
     image: "",
-    category: "Men",
-    subCategory: "Topwear",
+    category: "Fashion",
+    subCategory: "Men",
     sizes: [],
     bestseller: false
   })
@@ -33,6 +59,10 @@ function AddProduct() {
   const [sizeInput, setSizeInput] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
+  // =====================================================
+  // HANDLE INPUT
+  // =====================================================
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target
@@ -42,6 +72,51 @@ function AddProduct() {
       [name]: type === "checkbox" ? checked : value
     }))
   }
+
+  // =====================================================
+  // HANDLE CATEGORY CHANGE
+  // =====================================================
+
+  const handleCategoryChange = (event) => {
+    const category = event.target.value
+
+    const firstSubCategory =
+      categoryOptions[category]?.[0] || ""
+
+    setFormData((prev) => ({
+      ...prev,
+      category,
+      subCategory: firstSubCategory
+    }))
+  }
+
+  // =====================================================
+  // SAFETY SYNC SUB CATEGORY
+  // =====================================================
+
+  useEffect(() => {
+    const availableSubCategories =
+      categoryOptions[formData.category] || []
+
+    if (
+      !availableSubCategories.includes(
+        formData.subCategory
+      )
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        subCategory:
+          availableSubCategories[0] || ""
+      }))
+    }
+  }, [
+    formData.category,
+    formData.subCategory
+  ])
+
+  // =====================================================
+  // ADD SIZE
+  // =====================================================
 
   const addSize = () => {
     const size = sizeInput.trim().toUpperCase()
@@ -63,6 +138,10 @@ function AddProduct() {
     setSizeInput("")
   }
 
+  // =====================================================
+  // REMOVE SIZE
+  // =====================================================
+
   const removeSize = (sizeToRemove) => {
     setFormData((prev) => ({
       ...prev,
@@ -71,6 +150,10 @@ function AddProduct() {
       )
     }))
   }
+
+  // =====================================================
+  // SUBMIT
+  // =====================================================
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -105,13 +188,16 @@ function AddProduct() {
         `${API_URL}/api/product/add`,
         {
           method: "POST",
+
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
           },
+
           body: JSON.stringify({
             name: formData.name.trim(),
-            description: formData.description.trim(),
+            description:
+              formData.description.trim(),
             price: Number(formData.price),
             image: formData.image.trim(),
             category: formData.category,
@@ -126,7 +212,8 @@ function AddProduct() {
 
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message || "Failed to add product"
+          data.message ||
+            "Failed to add product"
         )
       }
 
@@ -134,10 +221,14 @@ function AddProduct() {
 
       navigate("/admin/products")
     } catch (error) {
-      console.error("Add product error:", error)
+      console.error(
+        "Add product error:",
+        error
+      )
 
       setError(
-        error.message || "Failed to add product"
+        error.message ||
+          "Failed to add product"
       )
     } finally {
       setLoading(false)
@@ -149,9 +240,9 @@ function AddProduct() {
 
       <div className="mx-auto max-w-5xl">
 
-        {/* =================================
+        {/* =====================================================
             HEADER
-        ================================= */}
+        ====================================================== */}
 
         <div className="mb-7">
 
@@ -181,9 +272,9 @@ function AddProduct() {
               </h1>
 
               <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
-                Add a new product to your ShopX catalog
-                with pricing, categories, sizes and
-                product imagery.
+                Add a new product to your ShopX
+                catalog with pricing, categories,
+                sizes and product imagery.
               </p>
 
             </div>
@@ -192,13 +283,13 @@ function AddProduct() {
 
         </div>
 
-        {/* =================================
+        {/* =====================================================
             FORM
-        ================================= */}
+        ====================================================== */}
 
         <form onSubmit={handleSubmit}>
 
-          {/* Error */}
+          {/* ERROR */}
 
           {error && (
             <div className="mb-5 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">
@@ -209,6 +300,7 @@ function AddProduct() {
               />
 
               <div>
+
                 <p className="font-bold">
                   Unable to add product
                 </p>
@@ -216,6 +308,7 @@ function AddProduct() {
                 <p className="mt-1 leading-5">
                   {error}
                 </p>
+
               </div>
 
             </div>
@@ -223,13 +316,13 @@ function AddProduct() {
 
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
 
-            {/* =================================
+            {/* =================================================
                 MAIN FORM
-            ================================= */}
+            ================================================== */}
 
             <div className="space-y-6">
 
-              {/* Basic Information */}
+              {/* BASIC INFORMATION */}
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
@@ -240,6 +333,7 @@ function AddProduct() {
                   </div>
 
                   <div>
+
                     <h2 className="font-extrabold text-[#0B1F3A]">
                       Basic Information
                     </h2>
@@ -247,11 +341,12 @@ function AddProduct() {
                     <p className="mt-0.5 text-xs text-slate-400">
                       Enter the main product details
                     </p>
+
                   </div>
 
                 </div>
 
-                {/* Product Name */}
+                {/* PRODUCT NAME */}
 
                 <div>
 
@@ -274,7 +369,7 @@ function AddProduct() {
 
                 </div>
 
-                {/* Description */}
+                {/* DESCRIPTION */}
 
                 <div className="mt-5">
 
@@ -299,7 +394,9 @@ function AddProduct() {
 
               </section>
 
-              {/* Pricing & Classification */}
+              {/* =================================================
+                  PRICING & CLASSIFICATION
+              ================================================== */}
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
@@ -310,20 +407,23 @@ function AddProduct() {
                   </div>
 
                   <div>
+
                     <h2 className="font-extrabold text-[#0B1F3A]">
                       Pricing & Classification
                     </h2>
 
                     <p className="mt-0.5 text-xs text-slate-400">
-                      Set pricing and organize the product
+                      Set pricing and organize the
+                      product
                     </p>
+
                   </div>
 
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
 
-                  {/* Price */}
+                  {/* PRICE */}
 
                   <div>
 
@@ -355,7 +455,7 @@ function AddProduct() {
 
                   </div>
 
-                  {/* Category */}
+                  {/* MAIN CATEGORY */}
 
                   <div>
 
@@ -370,21 +470,28 @@ function AddProduct() {
                       id="product-category"
                       name="category"
                       value={formData.category}
-                      onChange={handleChange}
+                      onChange={handleCategoryChange}
                       className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#0B1F3A] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                     >
-                      <option value="Men">Men</option>
-                      <option value="Women">
-                        Women
-                      </option>
-                      <option value="Kids">Kids</option>
+
+                      {categories.map(
+                        (category) => (
+                          <option
+                            key={category}
+                            value={category}
+                          >
+                            {category}
+                          </option>
+                        )
+                      )}
+
                     </select>
 
                   </div>
 
                 </div>
 
-                {/* Sub Category */}
+                {/* SUB CATEGORY */}
 
                 <div className="mt-5">
 
@@ -402,32 +509,68 @@ function AddProduct() {
                     onChange={handleChange}
                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#0B1F3A] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                   >
-                    <option value="Topwear">
-                      Topwear
-                    </option>
 
-                    <option value="Bottomwear">
-                      Bottomwear
-                    </option>
+                    {(
+                      categoryOptions[
+                        formData.category
+                      ] || []
+                    ).map(
+                      (subCategory) => (
+                        <option
+                          key={subCategory}
+                          value={subCategory}
+                        >
+                          {subCategory}
+                        </option>
+                      )
+                    )}
 
-                    <option value="Winterwear">
-                      Winterwear
-                    </option>
-
-                    <option value="Footwear">
-                      Footwear
-                    </option>
-
-                    <option value="Accessories">
-                      Accessories
-                    </option>
                   </select>
+
+                </div>
+
+                {/* CATEGORY INFORMATION */}
+
+                <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50/60 p-4">
+
+                  <div className="flex items-start gap-3">
+
+                    <Tag
+                      size={17}
+                      className="mt-0.5 shrink-0 text-blue-600"
+                    />
+
+                    <div>
+
+                      <p className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                        Product Classification
+                      </p>
+
+                      <p className="mt-1 text-sm leading-5 text-slate-600">
+
+                        <span className="font-bold text-[#0B1F3A]">
+                          {formData.category}
+                        </span>
+
+                        {" → "}
+
+                        <span className="font-bold text-blue-600">
+                          {formData.subCategory}
+                        </span>
+
+                      </p>
+
+                    </div>
+
+                  </div>
 
                 </div>
 
               </section>
 
-              {/* Product Image */}
+              {/* =================================================
+                  PRODUCT IMAGE
+              ================================================== */}
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
@@ -438,6 +581,7 @@ function AddProduct() {
                   </div>
 
                   <div>
+
                     <h2 className="font-extrabold text-[#0B1F3A]">
                       Product Image
                     </h2>
@@ -445,6 +589,7 @@ function AddProduct() {
                     <p className="mt-0.5 text-xs text-slate-400">
                       Add a direct image URL
                     </p>
+
                   </div>
 
                 </div>
@@ -480,7 +625,7 @@ function AddProduct() {
                   publicly accessed by your website.
                 </p>
 
-                {/* Image Preview */}
+                {/* IMAGE PREVIEW */}
 
                 {formData.image.trim() && (
                   <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
@@ -517,26 +662,33 @@ function AddProduct() {
 
               </section>
 
-              {/* Sizes */}
+              {/* =================================================
+                  SIZES
+              ================================================== */}
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
                 <div className="mb-6 flex items-center gap-3">
 
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+
                     <span className="text-sm font-extrabold">
                       S
                     </span>
+
                   </div>
 
                   <div>
+
                     <h2 className="font-extrabold text-[#0B1F3A]">
                       Available Sizes
                     </h2>
 
                     <p className="mt-0.5 text-xs text-slate-400">
-                      Add all available product sizes
+                      Add all available product
+                      sizes
                     </p>
+
                   </div>
 
                 </div>
@@ -547,10 +699,14 @@ function AddProduct() {
                     type="text"
                     value={sizeInput}
                     onChange={(event) =>
-                      setSizeInput(event.target.value)
+                      setSizeInput(
+                        event.target.value
+                      )
                     }
                     onKeyDown={(event) => {
-                      if (event.key === "Enter") {
+                      if (
+                        event.key === "Enter"
+                      ) {
                         event.preventDefault()
                         addSize()
                       }
@@ -579,31 +735,32 @@ function AddProduct() {
 
                     <div className="flex flex-wrap gap-2">
 
-                      {formData.sizes.map((size) => (
+                      {formData.sizes.map(
+                        (size) => (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() =>
+                              removeSize(size)
+                            }
+                            className="group inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600"
+                          >
 
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() =>
-                            removeSize(size)
-                          }
-                          className="group inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Check
-                            size={14}
-                            className="group-hover:hidden"
-                          />
+                            <Check
+                              size={14}
+                              className="group-hover:hidden"
+                            />
 
-                          <Trash2
-                            size={14}
-                            className="hidden group-hover:block"
-                          />
+                            <Trash2
+                              size={14}
+                              className="hidden group-hover:block"
+                            />
 
-                          {size}
+                            {size}
 
-                        </button>
-
-                      ))}
+                          </button>
+                        )
+                      )}
 
                     </div>
 
@@ -622,13 +779,13 @@ function AddProduct() {
 
             </div>
 
-            {/* =================================
+            {/* =================================================
                 SIDEBAR
-            ================================= */}
+            ================================================== */}
 
             <div className="space-y-6">
 
-              {/* Bestseller */}
+              {/* BESTSELLER */}
 
               <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
@@ -639,14 +796,16 @@ function AddProduct() {
                   </div>
 
                   <div>
+
                     <h2 className="font-extrabold text-[#0B1F3A]">
                       Product Visibility
                     </h2>
 
                     <p className="mt-1 text-xs leading-5 text-slate-400">
-                      Highlight this product in your
-                      store.
+                      Highlight this product in
+                      your store.
                     </p>
+
                   </div>
 
                 </div>
@@ -656,7 +815,9 @@ function AddProduct() {
                   <input
                     type="checkbox"
                     name="bestseller"
-                    checked={formData.bestseller}
+                    checked={
+                      formData.bestseller
+                    }
                     onChange={handleChange}
                     className="mt-0.5 h-4 w-4 shrink-0 accent-blue-600"
                   />
@@ -668,8 +829,9 @@ function AddProduct() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-slate-500">
-                      Show this product as a bestseller
-                      across your store.
+                      Show this product as a
+                      bestseller across your
+                      store.
                     </p>
 
                   </div>
@@ -678,7 +840,7 @@ function AddProduct() {
 
               </section>
 
-              {/* Product Summary */}
+              {/* PRODUCT SUMMARY */}
 
               <section className="rounded-2xl bg-[#0B1F3A] p-5 text-white shadow-xl shadow-[#0B1F3A]/10 sm:p-6">
 
@@ -704,7 +866,8 @@ function AddProduct() {
                     </span>
 
                     <span className="max-w-[170px] truncate text-right text-xs font-bold">
-                      {formData.name || "Not added"}
+                      {formData.name ||
+                        "Not added"}
                     </span>
 
                   </div>
@@ -716,11 +879,15 @@ function AddProduct() {
                     </span>
 
                     <span className="text-sm font-extrabold">
+
                       {formData.price
                         ? `₹${Number(
                             formData.price
-                          ).toLocaleString("en-IN")}`
+                          ).toLocaleString(
+                            "en-IN"
+                          )}`
                         : "₹0"}
+
                     </span>
 
                   </div>
@@ -731,8 +898,20 @@ function AddProduct() {
                       Category
                     </span>
 
-                    <span className="text-xs font-bold">
+                    <span className="text-right text-xs font-bold">
                       {formData.category}
+                    </span>
+
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-3">
+
+                    <span className="text-xs text-slate-300">
+                      Sub Category
+                    </span>
+
+                    <span className="text-right text-xs font-bold text-blue-300">
+                      {formData.subCategory}
                     </span>
 
                   </div>
@@ -781,9 +960,9 @@ function AddProduct() {
 
           </div>
 
-          {/* =================================
+          {/* =================================================
               ACTIONS
-          ================================= */}
+          ================================================== */}
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
 
@@ -802,6 +981,7 @@ function AddProduct() {
                 disabled={loading}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0B1F3A] px-7 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-600/20 disabled:cursor-not-allowed disabled:opacity-50"
               >
+
                 {loading ? (
                   <>
                     <Loader2
@@ -816,6 +996,7 @@ function AddProduct() {
                     Add Product
                   </>
                 )}
+
               </button>
 
             </div>
@@ -825,6 +1006,7 @@ function AddProduct() {
         </form>
 
       </div>
+
     </main>
   )
 }
