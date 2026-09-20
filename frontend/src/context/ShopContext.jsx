@@ -1,94 +1,73 @@
 import { createContext, useEffect, useState } from "react"
-const API_URL = import.meta.env.VITE_API_URL
 
 export const ShopContext = createContext()
 
-function ShopContextProvider({ children }) {
-  // =========================
-  // PRODUCTS
-  // =========================
+const API_URL = import.meta.env.VITE_API_URL
 
+function ShopContextProvider({ children }) {
   const [products, setProducts] = useState([])
   const [loadingProducts, setLoadingProducts] = useState(true)
-
-  // =========================
-  // CART
-  // =========================
 
   const [cartItems, setCartItems] = useState([])
   const [loadingCart, setLoadingCart] = useState(false)
 
-  // =========================
-  // SEARCH
-  // =========================
-
   const [search, setSearch] = useState("")
   const [showSearch, setShowSearch] = useState(false)
 
-  // =========================
-  // SHOP SETTINGS
-  // =========================
-
-  const currency = "₹"
-  const delivery_fee = 10
-
-  // =========================
-  // LOGIN
-  // =========================
+  const [currency] = useState("₹")
+  const [delivery_fee] = useState(10)
 
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("token")
   )
 
-  // =========================
-  // GET PRODUCT ID
-  // =========================
-
-  const getProductId = product => {
-    if (!product) {
-      return null
-    }
+  // --------------------------------------------------
+  // Get Product ID
+  // --------------------------------------------------
+  const getProductId = (product) => {
+    if (!product) return null
 
     return product._id || product.id || null
   }
 
-  // =========================
-  // LOAD PRODUCTS
-  // =========================
+  // --------------------------------------------------
+  // Check whether product has sizes
+  // --------------------------------------------------
+  const productHasSizes = (product) => {
+    return (
+      Array.isArray(product?.sizes) &&
+      product.sizes.length > 0
+    )
+  }
 
+  // --------------------------------------------------
+  // Load Products
+  // --------------------------------------------------
   const loadProducts = async () => {
     try {
-      const response = await fetch(
-        `${API_URL}/api/product`
-      )
+      setLoadingProducts(true)
 
+      const response = await fetch(`${API_URL}/api/product`)
       const data = await response.json()
 
-      if (
-        data.success &&
-        Array.isArray(data.products)
-      ) {
-        setProducts(data.products)
+      if (data.success) {
+        setProducts(data.products || [])
       } else {
+        console.error("Failed to load products")
         setProducts([])
       }
     } catch (error) {
-      console.error(
-        "Failed to load products:",
-        error
-      )
-
+      console.error("Error loading products:", error)
       setProducts([])
     } finally {
       setLoadingProducts(false)
     }
   }
 
-  // =========================
-  // SAVE CART
-  // =========================
-
-  const saveCart = async cart => {
+  // --------------------------------------------------
+  // Save Cart To Backend
+  // --------------------------------------------------
+  const saveCart = async (cart) => {
     const token = localStorage.getItem("token")
 
     if (!token) {
@@ -96,398 +75,305 @@ function ShopContextProvider({ children }) {
     }
 
     try {
-      const response = await fetch(
-        `${API_URL}/api/cart/update`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-
-          body: JSON.stringify({
-            cartData: cart
-          })
-        }
-      )
+      const response = await fetch(`${API_URL}/api/cart/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          cartData: cart,
+        }),
+      })
 
       const data = await response.json()
 
       if (!data.success) {
-        console.error(
-          "Cart save failed:",
-          data.message
-        )
+        console.error("Failed to save cart:", data.message)
       }
     } catch (error) {
-      console.error(
-        "Failed to save cart:",
-        error
-      )
+      console.error("Error saving cart:", error)
     }
   }
 
-  // =========================
-  // LOAD CART
-  // =========================
-
+  // --------------------------------------------------
+  // Load Cart From Backend
+  // --------------------------------------------------
   const loadCart = async () => {
     const token = localStorage.getItem("token")
 
     if (!token) {
       setCartItems([])
-      setLoadingCart(false)
       return
     }
 
-    setLoadingCart(true)
-
     try {
-      const response = await fetch(
-        `${API_URL}/api/cart`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
+      setLoadingCart(true)
+
+      const response = await fetch(`${API_URL}/api/cart`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       const data = await response.json()
 
-      if (
-        data.success &&
-        Array.isArray(data.cartData)
-      ) {
-        const validCart = data.cartData.filter(
-          item =>
+      if (data.success) {
+        const backendCart = Array.isArray(data.cartData)
+          ? data.cartData
+          : []
+
+        // Do not require a size here.
+        // Products without sizes are stored as "One Size".
+        const validCart = backendCart.filter((item) => {
+          const productId = getProductId(item?.product)
+
+          return (
             item &&
-            item.product &&
-            getProductId(item.product) &&
-            item.size &&
+            productId &&
             Number(item.quantity) > 0
-        )
+          )
+        })
 
         setCartItems(validCart)
       } else {
         setCartItems([])
       }
     } catch (error) {
-      console.error(
-        "Failed to load cart:",
-        error
-      )
-
+      console.error("Error loading cart:", error)
       setCartItems([])
     } finally {
       setLoadingCart(false)
     }
   }
 
-  // =========================
-  // INITIAL LOAD
-  // =========================
-
+  // --------------------------------------------------
+  // Initial Product Load
+  // --------------------------------------------------
   useEffect(() => {
     loadProducts()
   }, [])
 
+  // --------------------------------------------------
+  // Load Cart When Login State Changes
+  // --------------------------------------------------
   useEffect(() => {
     loadCart()
   }, [isLoggedIn])
 
-  // =========================
-  // LOGIN
-  // =========================
-
+  // --------------------------------------------------
+  // Login
+  // --------------------------------------------------
   const login = () => {
     setIsLoggedIn(true)
   }
 
-  // =========================
-  // LOGOUT
-  // =========================
-
+  // --------------------------------------------------
+  // Logout
+  // --------------------------------------------------
   const logout = () => {
     localStorage.removeItem("token")
-    localStorage.removeItem("user")
 
-    setCartItems([])
     setIsLoggedIn(false)
+    setCartItems([])
   }
 
-  // =========================
-  // ADD TO CART
-  // =========================
+  // --------------------------------------------------
+  // Add Product To Cart
+  // --------------------------------------------------
+  const addToCart = async (productOrId, size) => {
+    let product = null
 
-  const addToCart = (productOrId, size) => {
-    if (!productOrId || !size) {
-      console.error(
-        "Product or size missing"
-      )
-
-      return
-    }
-
-    let product = productOrId
-
-    // If only an ID was passed,
-    // find the product in products
-    if (typeof productOrId !== "object") {
+    // If complete product object was passed
+    if (typeof productOrId === "object") {
+      product = productOrId
+    } else {
+      // If only product ID was passed
       product = products.find(
-        item =>
-          String(getProductId(item)) ===
-          String(productOrId)
+        (item) => getProductId(item) === productOrId
       )
     }
 
     if (!product) {
-      console.error(
-        "Product not found:",
-        productOrId
-      )
-
+      console.error("Product not found")
       return
     }
 
     const productId = getProductId(product)
 
     if (!productId) {
-      console.error(
-        "Product has no ID:",
-        product
-      )
-
+      console.error("Product ID missing")
       return
     }
 
-    setCartItems(prev => {
-      const safeCart = Array.isArray(prev)
-        ? prev.filter(
-            item =>
-              item &&
-              item.product &&
-              getProductId(item.product)
-          )
-        : []
+    // ------------------------------------------------
+    // Check if this product has sizes
+    // ------------------------------------------------
+    const hasSizes = productHasSizes(product)
 
-      const existingItem = safeCart.find(
-        item =>
-          String(
-            getProductId(item.product)
-          ) === String(productId) &&
-          item.size === size
-      )
+    // Products WITH sizes must have a size
+    if (hasSizes && !size) {
+      console.error("Please select a size")
+      return
+    }
 
-      let updatedCart
+    // Products WITHOUT sizes use "One Size"
+    const selectedSize = hasSizes
+      ? size
+      : "One Size"
 
-      // Product already exists
-      if (existingItem) {
-        updatedCart = safeCart.map(item =>
-          String(
-            getProductId(item.product)
-          ) === String(productId) &&
-          item.size === size
-            ? {
-                ...item,
-                quantity:
-                  Number(item.quantity) + 1
-              }
-            : item
-        )
+    // ------------------------------------------------
+    // Check existing cart item
+    // ------------------------------------------------
+    const existingItemIndex = cartItems.findIndex(
+      (item) =>
+        getProductId(item.product) === productId &&
+        item.size === selectedSize
+    )
+
+    let updatedCart
+
+    if (existingItemIndex !== -1) {
+      // Product already exists -> increase quantity
+      updatedCart = [...cartItems]
+
+      updatedCart[existingItemIndex] = {
+        ...updatedCart[existingItemIndex],
+        quantity:
+          Number(updatedCart[existingItemIndex].quantity || 0) + 1,
       }
-
+    } else {
       // New product
-      else {
-        updatedCart = [
-          ...safeCart,
-          {
-            product,
-            size,
-            quantity: 1
-          }
-        ]
+      const newItem = {
+        product: product,
+        size: selectedSize,
+        quantity: 1,
       }
 
-      saveCart(updatedCart)
+      updatedCart = [...cartItems, newItem]
+    }
 
-      return updatedCart
-    })
+    setCartItems(updatedCart)
+
+    // Save to backend
+    await saveCart(updatedCart)
   }
 
-  // =========================
-  // REMOVE FROM CART
-  // =========================
+  // --------------------------------------------------
+  // Remove Product From Cart
+  // --------------------------------------------------
+  const removeFromCart = async (productId, size) => {
+    const updatedCart = cartItems.filter(
+      (item) =>
+        !(
+          getProductId(item.product) === productId &&
+          item.size === size
+        )
+    )
 
-  const removeFromCart = (
-    productId,
-    size
-  ) => {
-    setCartItems(prev => {
-      const safeCart = Array.isArray(prev)
-        ? prev
-        : []
+    setCartItems(updatedCart)
 
-      const updatedCart = safeCart.filter(
-        item => {
-          if (
-            !item ||
-            !item.product
-          ) {
-            return false
-          }
-
-          return !(
-            String(
-              getProductId(item.product)
-            ) === String(productId) &&
-            item.size === size
-          )
-        }
-      )
-
-      saveCart(updatedCart)
-
-      return updatedCart
-    })
+    await saveCart(updatedCart)
   }
 
-  // =========================
-  // UPDATE QUANTITY
-  // =========================
-
-  const updateQuantity = (
+  // --------------------------------------------------
+  // Update Quantity
+  // --------------------------------------------------
+  const updateQuantity = async (
     productId,
     size,
     quantity
   ) => {
     const newQuantity = Number(quantity)
 
+    let updatedCart
+
     if (newQuantity <= 0) {
-      removeFromCart(
-        productId,
-        size
+      updatedCart = cartItems.filter(
+        (item) =>
+          !(
+            getProductId(item.product) === productId &&
+            item.size === size
+          )
       )
-
-      return
-    }
-
-    setCartItems(prev => {
-      const safeCart = Array.isArray(prev)
-        ? prev
-        : []
-
-      const updatedCart = safeCart.map(item => {
+    } else {
+      updatedCart = cartItems.map((item) => {
         if (
-          item &&
-          item.product &&
-          String(
-            getProductId(item.product)
-          ) === String(productId) &&
+          getProductId(item.product) === productId &&
           item.size === size
         ) {
           return {
             ...item,
-            quantity: newQuantity
+            quantity: newQuantity,
           }
         }
 
         return item
       })
+    }
 
-      saveCart(updatedCart)
+    setCartItems(updatedCart)
 
-      return updatedCart
-    })
+    await saveCart(updatedCart)
   }
 
-  // =========================
-  // CART COUNT
-  // =========================
-
+  // --------------------------------------------------
+  // Get Cart Count
+  // --------------------------------------------------
   const getCartCount = () => {
-    if (!Array.isArray(cartItems)) {
-      return 0
-    }
-
     return cartItems.reduce(
-      (total, item) => {
-        if (
-          !item ||
-          !item.product ||
-          !item.quantity
-        ) {
-          return total
-        }
-
-        return (
-          total +
-          Number(item.quantity)
-        )
-      },
+      (total, item) =>
+        total + Number(item.quantity || 0),
       0
     )
   }
 
-  // =========================
-  // CART AMOUNT
-  // =========================
-
+  // --------------------------------------------------
+  // Get Cart Amount
+  // --------------------------------------------------
   const getCartAmount = () => {
-    if (!Array.isArray(cartItems)) {
-      return 0
-    }
+    return cartItems.reduce((total, item) => {
+      const price = Number(item.product?.price || 0)
+      const quantity = Number(item.quantity || 0)
 
-    return cartItems.reduce(
-      (total, item) => {
-        if (
-          !item ||
-          !item.product ||
-          typeof item.product.price !==
-            "number"
-        ) {
-          return total
-        }
-
-        return (
-          total +
-          item.product.price *
-            Number(item.quantity)
-        )
-      },
-      0
-    )
+      return total + price * quantity
+    }, 0)
   }
 
-  // =========================
-  // CONTEXT VALUE
-  // =========================
-
+  // --------------------------------------------------
+  // Context Value
+  // --------------------------------------------------
   const value = {
     products,
     loadingProducts,
-    loadProducts,
+
+    cartItems,
+    loadingCart,
 
     search,
     setSearch,
+
     showSearch,
     setShowSearch,
 
     currency,
     delivery_fee,
 
-    cartItems,
+    isLoggedIn,
+
+    login,
+    logout,
+
     addToCart,
     removeFromCart,
     updateQuantity,
+
     getCartCount,
     getCartAmount,
-    loadingCart,
-    loadCart,
 
-    isLoggedIn,
-    login,
-    logout
+    loadProducts,
+    loadCart,
   }
 
   return (
