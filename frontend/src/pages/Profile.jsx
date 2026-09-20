@@ -1,3 +1,4 @@
+
 import { useContext, useEffect, useState } from "react"
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -78,22 +79,18 @@ const Profile = () => {
       <main className="min-h-[75vh] bg-slate-50 px-4 py-10 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-4xl">
 
-          {/* Header Skeleton */}
           <div className="mb-8">
             <div className="h-9 w-44 animate-pulse rounded-lg bg-slate-200" />
             <div className="mt-3 h-4 w-64 animate-pulse rounded bg-slate-200" />
           </div>
 
-          {/* Profile Skeleton */}
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
-            {/* Banner */}
             <div className="h-32 animate-pulse bg-slate-200 sm:h-40" />
 
             <div className="px-5 pb-8 sm:px-8">
 
-              {/* Identity */}
-              <div className="relative pt-16 sm:pt-20">
+              <div className="relative pt-32 sm:pt-20">
 
                 <div className="absolute left-0 top-0 h-24 w-24 animate-pulse rounded-3xl bg-slate-300 sm:h-28 sm:w-28" />
 
@@ -104,10 +101,8 @@ const Profile = () => {
 
               </div>
 
-              {/* Badge */}
               <div className="mt-8 h-20 animate-pulse rounded-2xl bg-slate-100" />
 
-              {/* Information */}
               <div className="mt-8 space-y-5">
 
                 <div className="h-5 w-40 animate-pulse rounded bg-slate-200" />
@@ -169,9 +164,9 @@ const Profile = () => {
     user?.name?.charAt(0)?.toUpperCase() || "U"
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 sm:py-12">
+    <main className="min-h-screen overflow-x-hidden bg-slate-50 px-3 py-6 sm:px-6 sm:py-12">
 
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto w-full max-w-4xl">
 
         {/* =========================
             PAGE HEADER
@@ -198,7 +193,7 @@ const Profile = () => {
             PROFILE CARD
         ========================= */}
 
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
           {/* =========================
               PROFILE BANNER
@@ -206,15 +201,12 @@ const Profile = () => {
 
           <div className="relative h-32 overflow-hidden bg-[#0B1F3A] sm:h-40">
 
-            {/* Decorative glow */}
             <div className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-blue-600/20 blur-2xl" />
 
             <div className="absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-blue-500/10 blur-2xl" />
 
-            {/* Gradient */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#0B1F3A] via-[#0B1F3A] to-[#123c70]" />
 
-            {/* Banner Content */}
             <div className="relative flex h-full items-center px-5 sm:px-8">
 
               <div>
@@ -237,41 +229,74 @@ const Profile = () => {
               PROFILE CONTENT
           ========================= */}
 
-          <div className="px-5 pb-7 sm:px-8 sm:pb-9">
+          <div className="px-4 pb-7 sm:px-8 sm:pb-9">
 
             {/* =========================
                 USER IDENTITY
             ========================= */}
 
-            <div className="relative pt-16 sm:pt-20">
+            <div className="relative">
 
-              {/* Avatar
-                  Only the avatar overlaps
-                  the banner.
-              */}
+              {/* MOBILE IDENTITY */}
+              <div className="flex flex-col pt-0 sm:hidden">
 
-              <div className="absolute left-0 top-0 flex h-24 w-24 items-center justify-center rounded-3xl border-4 border-white bg-blue-600 text-3xl font-extrabold text-white shadow-xl sm:h-28 sm:w-28 sm:text-4xl">
-                {firstLetter}
+                {/* Avatar */}
+
+                <div className="-mt-12 flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border-4 border-white bg-blue-600 text-3xl font-extrabold text-white shadow-xl">
+                  {firstLetter}
+                </div>
+
+                {/* Name + Email */}
+
+                <div className="mt-4 min-w-0 w-full">
+
+                  <h2 className="max-w-full break-words text-2xl font-extrabold leading-tight tracking-tight text-[#0B1F3A]">
+                    {user?.name}
+                  </h2>
+
+                  <div className="mt-2 flex min-w-0 w-full items-start gap-1.5 text-sm text-slate-500">
+
+                    <Mail
+                      size={14}
+                      className="mt-0.5 shrink-0"
+                    />
+
+                    <span className="min-w-0 break-all leading-5">
+                      {user?.email}
+                    </span>
+
+                  </div>
+
+                </div>
+
               </div>
 
-              {/* Name + Email */}
+              {/* DESKTOP IDENTITY */}
 
-              <div className="min-w-0">
+              <div className="relative hidden pt-20 sm:block">
 
-                <h2 className="text-2xl font-extrabold tracking-tight text-[#0B1F3A] sm:text-3xl">
-                  {user?.name}
-                </h2>
+                <div className="absolute left-0 top-0 flex h-28 w-28 items-center justify-center rounded-3xl border-4 border-white bg-blue-600 text-4xl font-extrabold text-white shadow-xl">
+                  {firstLetter}
+                </div>
 
-                <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
+                <div className="min-w-0">
 
-                  <Mail
-                    size={14}
-                    className="shrink-0"
-                  />
+                  <h2 className="max-w-full break-words text-3xl font-extrabold leading-tight tracking-tight text-[#0B1F3A]">
+                    {user?.name}
+                  </h2>
 
-                  <span className="break-all">
-                    {user?.email}
-                  </span>
+                  <div className="mt-1 flex min-w-0 items-center gap-1.5 text-sm text-slate-500">
+
+                    <Mail
+                      size={14}
+                      className="shrink-0"
+                    />
+
+                    <span className="min-w-0 break-all">
+                      {user?.email}
+                    </span>
+
+                  </div>
 
                 </div>
 
@@ -283,12 +308,10 @@ const Profile = () => {
                 ACCOUNT BADGE
             ========================= */}
 
-            <div className="mt-8 flex items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+            <div className="mt-8 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4">
 
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-
                 <ShieldCheck size={20} />
-
               </div>
 
               <div className="min-w-0">
@@ -297,7 +320,7 @@ const Profile = () => {
                   Account Verified
                 </p>
 
-                <p className="mt-0.5 text-xs leading-5 text-slate-500">
+                <p className="mt-0.5 break-words text-xs leading-5 text-slate-500">
                   Your ShopX account information is securely stored.
                 </p>
 
@@ -325,27 +348,23 @@ const Profile = () => {
 
               <div className="grid gap-4 sm:grid-cols-2">
 
-                {/* =========================
-                    NAME
-                ========================= */}
+                {/* NAME */}
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
+                <div className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
 
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-
                       <User size={18} />
-
                     </div>
 
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
 
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                         Name
                       </p>
 
-                      <p className="mt-1 truncate text-sm font-bold text-[#0B1F3A]">
+                      <p className="mt-1 break-words text-sm font-bold text-[#0B1F3A]">
                         {user?.name}
                       </p>
 
@@ -355,27 +374,23 @@ const Profile = () => {
 
                 </div>
 
-                {/* =========================
-                    EMAIL
-                ========================= */}
+                {/* EMAIL */}
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
+                <div className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40">
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
 
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-
                       <Mail size={18} />
-
                     </div>
 
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
 
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                         Email
                       </p>
 
-                      <p className="mt-1 truncate text-sm font-bold text-[#0B1F3A]">
+                      <p className="mt-1 break-all text-sm font-bold text-[#0B1F3A]">
                         {user?.email}
                       </p>
 
@@ -385,28 +400,23 @@ const Profile = () => {
 
                 </div>
 
-                {/* =========================
-                    ACCOUNT CREATED
-                ========================= */}
+                {/* ACCOUNT CREATED */}
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40 sm:col-span-2">
+                <div className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-200 hover:bg-blue-50/40 sm:col-span-2">
 
                   <div className="flex items-center gap-3">
 
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-
                       <CalendarDays size={18} />
-
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
 
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                         Account Created
                       </p>
 
                       <p className="mt-1 text-sm font-bold text-[#0B1F3A]">
-
                         {new Date(
                           user?.createdAt
                         ).toLocaleDateString("en-IN", {
@@ -414,7 +424,6 @@ const Profile = () => {
                           month: "long",
                           year: "numeric"
                         })}
-
                       </p>
 
                     </div>
@@ -443,24 +452,22 @@ const Profile = () => {
 
                 <Link
                   to="/orders"
-                  className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-sm"
+                  className="group flex min-w-0 items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-sm"
                 >
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
 
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
-
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
                       <ShoppingBag size={18} />
-
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
 
                       <p className="text-sm font-bold text-[#0B1F3A]">
                         My Orders
                       </p>
 
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="mt-0.5 truncate text-xs text-slate-500">
                         View your order history
                       </p>
 
@@ -470,7 +477,7 @@ const Profile = () => {
 
                   <ChevronRight
                     size={18}
-                    className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
+                    className="ml-2 shrink-0 text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
                   />
 
                 </Link>
@@ -479,24 +486,22 @@ const Profile = () => {
 
                 <Link
                   to="/products"
-                  className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-sm"
+                  className="group flex min-w-0 items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-sm"
                 >
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
 
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
-
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
                       <ShoppingBag size={18} />
-
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
 
                       <p className="text-sm font-bold text-[#0B1F3A]">
                         Browse Products
                       </p>
 
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="mt-0.5 truncate text-xs text-slate-500">
                         Explore our collection
                       </p>
 
@@ -506,7 +511,7 @@ const Profile = () => {
 
                   <ChevronRight
                     size={18}
-                    className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
+                    className="ml-2 shrink-0 text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
                   />
 
                 </Link>
@@ -545,3 +550,4 @@ const Profile = () => {
 }
 
 export default Profile
+
